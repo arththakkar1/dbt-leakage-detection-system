@@ -1,59 +1,44 @@
-# DBT Leakage Detection System: Simulated Data Schema
+# DBT Leakage Detection System: Simulated Data Schema & Analysis
 
-To effectively test and demonstrate the system during the hackathon, we generate mock data representing the reality of DBT databases.
+This document details the schema of the provided datasets (`TS-PS4-1.csv` and `TS-PS4-2.csv`) and analyzes how their structure supports the required leakage detection rules for the hackathon.
 
-## 1. Beneficiary Database `beneficiaries_mock.csv`
-Contains the demographic details of enrolled citizens.
+## 1. Primary Transactions Dataset (`data/TS-PS4-1.csv`)
 
-| Field | Type | Description | Mock Example |
+This file contains the historical and current disbursement records, acting as the primary payload for the anomaly detection engine.
+
+### Data Dictionary
+| Field | Type | Description | Observed Mock Data Examples |
 | :--- | :--- | :--- | :--- |
-| `beneficiary_id` | String | Unique system ID | `ben_1009` |
-| `aadhaar_hash` | String | SHA-256 hash of Aadhaar | `e3b0c442...` |
-| `name_english` | String | Name in Latin script | `Kantibhai Desai` |
-| `name_gujarati` | String | Name in Gujarati script | `કાંતિભાઈ દેસાઈ` |
-| `dob` | Date | Date of Birth | `1965-04-12` |
-| `district_id` | String | Standard district code | `GJ-01` (Ahmedabad) |
-| `address` | String | Residential address | `12, M.G. Road...` |
+| `beneficiary_id` | String | Unique system ID | `B100000`, `B100001` |
+| `aadhaar` | Integer | 12-digit Aadhaar Number | `223005401501`, `130201276659` |
+| `name` | String | Beneficiary Name (with transliteration variations) | `Suresh Patel`, `Suresh Ptl`, `Sureshbhai Patel` |
+| `scheme` | String | Welfare Scheme Identifier | `PM-KISAN`, `Pension`, `Scholarship` |
+| `district` | String | Gujarat District | `Surat`, `Bhavnagar`, `Rajkot`, `Ahmedabad` |
+| `amount` | Integer | Disbursed Amount (₹) | `1000`, `2000`, `3000`, `5000` |
+| `transaction_date`| Date | Date of fund transfer (YYYY-MM-DD) | `2023-07-29`, `2024-02-12` |
+| `withdrawn` | Boolean | `1` if funds were withdrawn, `0` if sitting dormant | `0`, `1` |
+| `status` | String | Gateway status of the transaction | `SUCCESS`, `FAILED` |
 
-## 2. Transaction Payload `transactions_batch.json`
-Represents the array of disbursements fired during a payment cycle. This is the payload that needs to be processed in under 30 seconds.
+### Dataset Analysis (Leakage Coverage)
+*   **Volume:** Contains 50,000+ transaction records, perfect for benchmarking the "10,000+ transactions in 30 seconds" requirement.
+*   **Undrawn Funds Detection:** The `withdrawn` column explicitly flags dormant funds. If `withdrawn = 0` across multiple historical transactions for the same `beneficiary_id`, it signals a high probability of a middleman or an unaware beneficiary.
+*   **Duplicate Identity (Transliterations):** The `name` column purposefully contains injected variations of standard Gujarati names (e.g., *Mahesh Shah*, *Maheshbhai Shah*, *Mahesh S.*). This perfectly allows the testing of Levenshtein/Fuzzy matching algorithms.
+*   **Cross-Scheme Verification:** Beneficiaries can be grouped by `aadhaar` to check if they are claiming mutually exclusive benefits across `PM-KISAN`, `Pension`, and `Scholarship`.
 
-```json
-[
-  {
-    "transaction_id": "tx_99821",
-    "beneficiary_id": "ben_1009",
-    "scheme_id": "SCH_WIDOW_PENSION",
-    "amount": 1250.00,
-    "bank_account_no": "98765432101",
-    "ifsc_code": "SBIN0004321",
-    "timestamp": "2026-05-04T09:00:00Z"
-  },
-  {
-    "transaction_id": "tx_99822",
-    "beneficiary_id": "ben_4044",
-    "scheme_id": "SCH_OLD_AGE",
-    "amount": 2000.00,
-    "bank_account_no": "11223344556",
-    "ifsc_code": "HDFC0001234",
-    "timestamp": "2026-05-04T09:00:01Z"
-  }
-]
-```
+---
 
-## 3. Civil Death Register `death_register_mock.csv`
-Simulates the state's vital statistics database. The ML engine cross-references against this.
+## 2. Civil Death Register Dataset (`data/TS-PS4-2.csv`)
 
-| Field | Type | Description | Mock Example |
+This file represents the official vital statistics registry. The ML engine will cross-reference transactions against this list to catch disbursements to deceased individuals.
+
+### Data Dictionary
+| Field | Type | Description | Observed Mock Data Examples |
 | :--- | :--- | :--- | :--- |
-| `record_id` | String | Unique register ID | `dr_5502` |
-| `aadhaar_hash` | String | SHA-256 hash (if available) | `e3b0c442...` |
-| `name` | String | Full name on certificate | `Kantibhai Desai` |
-| `date_of_death`| Date | Official Date of Death | `2025-11-20` |
-| `district_id` | String | District of registration | `GJ-01` |
+| `aadhaar` | Integer | 12-digit Aadhaar Number | `893725541723`, `986322242576` |
+| `name` | String | Deceased Individual's Name | `Mahesh Shah`, `Amit Joshi` |
+| `death_date` | Date | Official Date of Death (YYYY-MM-DD) | `2025-11-29`, `2023-02-26` |
 
-## Data Generation Strategy
-To demonstrate the system's effectiveness:
-1.  **Baseline Data:** Generate 9,500 clean, valid transactions.
-2.  **Injected Fraud:** Purposely inject 500 fraudulent records that violate the 4 core rules (e.g., intentionally creating a transaction for a beneficiary whose Aadhaar hash is in the `death_register_mock.csv`).
-3.  **Transliteration Variations:** Use python scripts to slightly alter English spellings of Gujarati names to test the Levenshtein distance engine.
+### Dataset Analysis (Leakage Coverage)
+*   **Volume:** Contains 1,000 death records.
+*   **Deceased Beneficiary Detection:** The core logic engine must execute a join operation between `TS-PS4-1.csv` and `TS-PS4-2.csv` on the `aadhaar` column.
+*   **Temporal Logic:** The engine must compare the transaction's `transaction_date` against the registry's `death_date`. A flag should only be triggered if `transaction_date > death_date` (i.e., funds were sent *after* the person died).
