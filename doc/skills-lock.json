@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "documentation-writer": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/documentation-writer/SKILL.md",
+      "computedHash": "ee53d65b163cd7eb953a930c95841cfe398cc2c0bd24c06508bbaa07c432be35"
+    },
+    "markdown-documentation": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "github",
+      "skillPath": "skills/markdown-documentation/SKILL.md",
+      "computedHash": "bebe932f4f94560dd90ae7534f2a8731edb70a3ca33f96ad8127cb1de4464780"
+    }
+  }
+}

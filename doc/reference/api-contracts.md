@@ -1,11 +1,17 @@
-# DBT Leakage Detection System: API Contracts
+# API Contracts
 
-This document outlines the core RESTful API contracts between the Next.js Frontend, the Core Backend Orchestrator, and the Python/Flask ML Service.
+> [!NOTE]
+> Outlines the core RESTful API contracts between the Next.js Frontend, 
+> the Core Backend Orchestrator, and the Python/Flask ML Service.
 
-## 1. Core Backend -> Python ML Service
+## Table of Contents
+- [1. Backend to ML Service](#1-backend-to-ml-service)
+- [2. Frontend to Backend](#2-frontend-to-backend)
+
+## 1. Backend to ML Service
 
 ### `POST /api/ml/v1/score-batch`
-Sends a batch of new transactions to the ML engine for anomaly detection and risk scoring.
+Sends a batch of new transactions to the ML engine for anomaly detection.
 
 **Request Payload:**
 ```json
@@ -17,13 +23,8 @@ Sends a batch of new transactions to the ML engine for anomaly detection and ris
       "beneficiary_id": "ben_554",
       "aadhaar_hash": "a1b2c3d4...",
       "name_english": "Ramesh Patel",
-      "name_gujarati": "રમેશ પટેલ",
-      "scheme_id": "sch_01",
-      "bank_account": "1234567890",
-      "ifsc": "SBIN0001234",
       "amount": 2500.00
     }
-    // ... up to 10,000 records
   ]
 }
 ```
@@ -39,21 +40,16 @@ Sends a batch of new transactions to the ML engine for anomaly detection and ris
       "transaction_id": "txn_1001",
       "flag_type": "DUPLICATE_IDENTITY_TRANSLITERATION",
       "risk_score": 85,
-      "evidence_summary": "Name 'Ramesh Patel' matches 'Rames Patill' on transaction txn_0992 with 92% Levenshtein phonetic similarity."
+      "evidence_summary": "Name 'Ramesh Patel' matches 'Rames Patill' with 92% similarity."
     }
   ]
 }
 ```
 
-## 2. Next.js Frontend -> Core Backend
+## 2. Frontend to Backend
 
 ### `GET /api/v1/investigations/queue`
 Retrieves the prioritized queue of flagged transactions for the DFO Dashboard.
-
-**Query Parameters:**
-*   `district_id` (string)
-*   `status` (string) - OPEN, INVESTIGATING
-*   `limit` (int) - Pagination limit
 
 **Response Payload (200 OK):**
 ```json
@@ -69,12 +65,7 @@ Retrieves the prioritized queue of flagged transactions for the DFO Dashboard.
       "status": "OPEN",
       "created_at": "2026-05-04T10:00:00Z"
     }
-  ],
-  "pagination": {
-    "total_records": 142,
-    "current_page": 1,
-    "total_pages": 15
-  }
+  ]
 }
 ```
 
@@ -88,17 +79,6 @@ Submitted by the Scheme Verifier from the field via the mobile app.
   "gps_lat": 23.0225,
   "gps_long": 72.5714,
   "timestamp": "2026-05-04T12:30:00Z",
-  "finding": "CONFIRMED_FRAUD",
-  "notes": "Beneficiary confirmed deceased 2 years ago by neighbors. Aadhaar being used by relative.",
-  "photo_evidence_url": "https://storage.bucket.com/evidence/case_9001_photo.jpg"
-}
-```
-
-**Response Payload (201 Created):**
-```json
-{
-  "success": true,
-  "message": "Verification report submitted and case updated.",
-  "case_status": "RESOLVED_FRAUD"
+  "finding": "CONFIRMED_FRAUD"
 }
 ```

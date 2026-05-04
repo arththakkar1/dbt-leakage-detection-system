@@ -1,0 +1,46 @@
+# Leakage Rules Engine
+
+> [!NOTE]
+> Details the logical and mathematical frameworks used by the Python ML service 
+> to detect anomalies and assign Risk Scores.
+
+## Table of Contents
+- [1. Leakage Detection Rules](#1-leakage-detection-rules)
+- [2. Risk Score Math](#2-risk-score-math)
+
+## 1. Leakage Detection Rules
+
+### Rule 1: Deceased Beneficiary Detection
+*   **Logic:** Exact match of `aadhaar` against the State Civil Death Register.
+*   **Trigger:** Transaction `transaction_date` is strictly after the `death_date`.
+
+### Rule 2: Duplicate Identity (Transliteration-Aware)
+*   **Logic:** Detects when a single person is enrolled twice under slight name variations.
+*   **Algorithm:** 
+    1. Extract phonetic representations (Double Metaphone).
+    2. Calculate Levenshtein distance between strings in the same district/scheme.
+*   **Threshold:** Levenshtein similarity score `> 85%` triggers a flag.
+
+### Rule 3: Cross-Scheme Duplication
+*   **Logic:** Identifies identical `aadhaar` receiving funds from mutually exclusive schemes.
+*   **Trigger:** Database intersection between active beneficiaries of exclusive schemes.
+
+### Rule 4: Undrawn Funds / Middlemen Detection
+*   **Logic (Undrawn):** Checks the `withdrawn` boolean flag in historical transactions. If `withdrawn = 0` for over 120 days, it signals dormant funds.
+*   **Logic (Middlemen):** Groups `bank_account_no` across all transactions. If distinct `beneficiary_id` count `> 2` for a single account, it flags the account.
+
+## 2. Risk Score Math
+
+Every flagged transaction is assigned a Risk Score from 0 to 100 based on an additive formula.
+
+`Total Risk Score = Base Violation Score + Evidence Multipliers`
+
+### Example: Transliteration Match
+*   Base Violation (Duplicate Name in Scheme): `+40`
+*   Levenshtein similarity is 95%: `+30`
+*   Same District (`district_id` match): `+15`
+*   **Total Score: 85 (High Risk)**
+
+### Example: Deceased Detection
+*   Aadhaar Match in Death Register (`transaction_date > death_date`): `+100` 
+*   **Total Score: 100 (Critical Risk - Auto Block)**
