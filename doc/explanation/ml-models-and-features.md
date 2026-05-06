@@ -54,6 +54,11 @@ The system employs an ensemble of algorithms to ensure both high accuracy and co
 *   **Why:** These do not require probabilistic ML. They require absolute, lightning-fast set intersections.
 *   **Algorithm:** Pandas dataframe joins or Redis `SINTER` (Set Intersection) operations.
 
+### Model D: Prescriptive AI (Actionable Suggestions)
+*   **Target:** Translating raw classifications or regression scores into actionable, human-readable advice for the District Finance Officer.
+*   **Why:** Simply returning a classification flag (e.g., `MIDDLEMAN_ACCOUNT`) leaves the officer wondering what to do next. We use a model to explicitly state the fault and suggest a remedy.
+*   **Algorithm:** An LLM (Large Language Model) or a Rule-Based Expert System. It takes the outputs of Models A, B, and C as its context prompt and generates a prescriptive sentence.
+
 ## 4. Predicted Values (Outputs)
 
 The ML Engine does not operate as a "black box". It returns highly structured, explainable predictions.
@@ -75,3 +80,19 @@ A deterministic probability score indicating the severity and confidence of the 
 ### 3. Evidence String (Explainable AI)
 Every prediction includes a human-readable explanation string, for example: 
 > *"Aadhaar 1234 matched against Death Register. Transaction date (2024-02-12) occurred 45 days after Official Death Date (2023-12-29)."*
+
+### 4. Prescriptive Suggestion (Model D Output)
+Beyond simple classification, the system provides a direct suggestion on how to handle the fault.
+> *"Suggestion: Immediately halt funds. Do not dispatch field verifier as death is confirmed by State Registry."*
+
+## 5. End-to-End Example Flow
+
+To illustrate how features become predictions:
+
+**Scenario: Suspected Middleman Interception**
+*   **Raw Inputs:** Transaction `txn_882` for "Ramesh Patel", Amount: ₹2000. Target Bank Account: `000123456`.
+*   **Feature Extraction (Inputs):** The engine queries the database and calculates `beneficiaries_per_account = 6`. It calculates `days_since_withdrawal = 180`.
+*   **Model Processing:** The Isolation Forest (Model A) evaluates `[6, 180, 2000]` and isolates this point as a severe anomaly compared to the normal cluster (Score: 0.89).
+*   **Predicted Classification:** `MIDDLEMAN_ACCOUNT`
+*   **Predicted Risk Score:** `94` (Critical)
+*   **Generated Suggestion (Model D):** *"Fault: Account 000123456 is receiving funds for 6 distinct beneficiaries and no withdrawals have occurred in 180 days. Suggestion: Freeze account immediately and dispatch Verifier to Ramesh's registered address to investigate potential passbook confiscation by an agent."*
