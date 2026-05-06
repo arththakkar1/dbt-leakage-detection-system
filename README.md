@@ -44,15 +44,6 @@ Our documentation follows the Diataxis framework for clarity and structure. Plea
 
 ## Getting Started
 
-To test the system locally with simulated data:
+To test the system locally:
 
-1.  **Generate the Datasets:**
-    Use the provided data generator to create a 50,000+ row transaction log (`TS-PS4-1.csv`) and a 1,000 row death registry (`TS-PS4-2.csv`).
-
-    ```bash
-    pip install faker pandas
-    python generate_mock_data.py
-    ```
-
-2.  **Refer to the Tutorial:**
-    Please follow the [Getting Started Guide](doc/tutorials/getting-started.md) to initialize the Python ML Engine and the Next.js frontend applications.
+Please follow the [Getting Started Guide](doc/tutorials/getting-started.md) to initialize the Python ML Engine and the Next.js frontend applications.
