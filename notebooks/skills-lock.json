@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "ML Model Explanation": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "github",
+      "skillPath": "skills/ml-model-explanation/SKILL.md",
+      "computedHash": "685f054266dcac2db1d2f5d1a990f9783f529cfc537e5403c0efafe93c218fdf"
+    },
+    "ML Model Training": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "github",
+      "skillPath": "skills/ml-model-training/SKILL.md",
+      "computedHash": "47b34b94b9f0dd144305fdbb32ed7cba8d4cce117a91b00bddcbbec163e1fb11"
+    }
+  }
+}
