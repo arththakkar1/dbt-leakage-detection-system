@@ -25,15 +25,19 @@
 *   **Logic:** Identifies identical `aadhaar` receiving funds from mutually exclusive schemes.
 *   **Trigger:** Database intersection between active beneficiaries of exclusive schemes.
 
-### Rule 4: Undrawn Funds / Middlemen Detection
-*   **Logic (Undrawn):** Checks the `withdrawn` boolean flag in historical transactions. If `withdrawn = 0` for over 120 days, it signals dormant funds.
-*   **Logic (Middlemen):** Groups `bank_account_no` across all transactions. If distinct `beneficiary_id` count `> 2` for a single account, it flags the account.
+### Rule 4: Undrawn / Dormant Funds Detection
+*   **Logic:** Checks the `withdrawn` boolean flag across a beneficiary's entire transaction history.
+*   **Trigger:** If a beneficiary receives large disbursements (`total_amount > 5000`) but maintains a `withdrawal_rate = 0.0` over multiple transactions, it signals passbook confiscation or dormant funds.
 
 ## 2. Risk Score Math
 
-Every flagged transaction is assigned a Risk Score from 0 to 100 based on an additive formula.
+Every flagged transaction is assigned a Risk Score from 0 to 100.
 
+For deterministic rules, this is an additive formula:
 `Total Risk Score = Base Violation Score + Evidence Multipliers`
+
+For machine learning models (Isolation Forests), the score is calculated dynamically based on the algorithm's decision function:
+`Risk Score = ((max_score - raw_score) / (max_score - min_score)) * 100`
 
 ### Example: Transliteration Match
 *   Base Violation (Duplicate Name in Scheme): `+40`

@@ -7,6 +7,7 @@ The Direct Benefit Transfer (DBT) Leakage Detection System is an advanced, real-
 - **Proactive Anomaly Detection:** Shifts operational focus from post-audit discovery to near real-time flagging of suspicious transactions.
 - **High-Performance Processing:** Architected to ingest and evaluate over 10,000 transactions in under 30 seconds to support high-volume payment cycles via in-memory caching and parallel processing.
 - **Explainable AI Framework:** Provides a quantifiable, deterministic Risk Score for every flagged transaction, accompanied by specific evidentiary citations (e.g., Levenshtein distance metrics for transliteration duplicates).
+- **Advanced Machine Learning:** Utilizes an ensemble of models ranging from unsupervised Isolation Forests to Supervised Deep Learning Neural Networks (PyTorch & TensorFlow) to isolate complex fraud behaviors like dormant fund confiscation.
 - **Closed-Loop Resolution:** Enables end-to-end tracking of flagged anomalies, from initial detection to field verification via GPS-stamped reporting by scheme verifiers.
 
 ## Technology Stack
@@ -45,6 +46,6 @@ Our documentation follows the Diataxis framework for clarity and structure. Plea
 
 ## Getting Started
 
-To test the system locally:
+To test the system locally or explore the interactive Jupyter Notebooks detailing our machine learning pipeline:
 
-Please follow the [Getting Started Guide](doc/tutorials/getting-started.md) to initialize the Python ML Engine and the Next.js frontend applications.
+Please follow the [Getting Started Guide](doc/tutorials/getting-started.md) to initialize the PyTorch/TensorFlow models, the Python ML Engine, and the Next.js frontend application.

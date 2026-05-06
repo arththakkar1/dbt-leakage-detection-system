@@ -14,6 +14,7 @@
 *   Node.js (v18+)
 *   Python (3.9+)
 *   Git
+*   Python Data Science Stack (`pip install pandas scikit-learn torch tensorflow fuzzywuzzy matplotlib seaborn`)
 
 ## Step 1: Clone and Setup
 
@@ -36,12 +37,27 @@ python app.py
 
 The ML service will now be listening on `http://localhost:5000`.
 
-## Step 3: Run the Next.js Frontend
+## Step 3: Explore the Machine Learning Pipeline (Jupyter Notebooks)
+
+Before running the full system, you can interact directly with the core algorithms using our executable Jupyter Notebooks. These notebooks ingest the real datasets (`data/TS-PS4-1.csv`) and visualize the detection logic.
+
+```bash
+cd ../notebooks/
+# Launch Jupyter Lab or open the .ipynb files in VSCode
+jupyter lab
+```
+
+You will find notebooks detailing:
+1.  Isolation Forest anomaly detection (Dormant Funds).
+2.  Levenshtein Distance string matching (Duplicate Identities).
+3.  Supervised Neural Networks (PyTorch/TensorFlow).
+
+## Step 4: Run the Next.js Frontend
 
 Open a new terminal window to start the interactive dashboard.
 
 ```bash
-cd frontend/
+cd ../frontend/
 npm install
 npm run dev
 ```

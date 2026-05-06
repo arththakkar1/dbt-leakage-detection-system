@@ -38,10 +38,10 @@ Before the models can evaluate a transaction, the Python engine extracts and eng
 The system employs an ensemble of algorithms to ensure both high accuracy and computational speed.
 
 ### Model A: Isolation Forests (Behavioral Anomaly Detection)
-*   **Target:** Detecting Middlemen and Undrawn Funds.
-*   **Why:** Traditional rule-engines fail when middlemen slightly alter their behavior. An Isolation Forest is an unsupervised machine learning algorithm that identifies anomalies instead of normal observations.
-*   **Features Used:** `beneficiaries_per_account`, `days_since_withdrawal`, `amount`.
-*   **Logic:** Accounts acting as aggregation nodes for multiple unrelated beneficiaries will be isolated as anomalies in the high-dimensional feature space.
+*   **Target:** Detecting Dormant Funds and Undrawn Anomalies.
+*   **Why:** Traditional rule-engines fail when behaviors change subtly. An Isolation Forest is an unsupervised machine learning algorithm that identifies mathematical anomalies instead of normal observations.
+*   **Features Used:** `total_transactions`, `withdrawal_rate`, `total_amount`.
+*   **Logic:** Beneficiaries receiving massive disbursements but maintaining a `0.0` withdrawal rate are isolated as extreme anomalies in the high-dimensional feature space, triggering flags.
 
 ### Model B: Fuzzy String Matching (Transliteration Handling)
 *   **Target:** Duplicate Identity Detection.
@@ -56,8 +56,13 @@ The system employs an ensemble of algorithms to ensure both high accuracy and co
 
 ### Model D: Prescriptive AI (Actionable Suggestions)
 *   **Target:** Translating raw classifications or regression scores into actionable, human-readable advice for the District Finance Officer.
-*   **Why:** Simply returning a classification flag (e.g., `MIDDLEMAN_ACCOUNT`) leaves the officer wondering what to do next. We use a model to explicitly state the fault and suggest a remedy.
-*   **Algorithm:** An LLM (Large Language Model) or a Rule-Based Expert System. It takes the outputs of Models A, B, and C as its context prompt and generates a prescriptive sentence.
+*   **Why:** Simply returning a classification flag (e.g., `DORMANT_UNDRAWN_FUNDS`) leaves the officer wondering what to do next. We use a generative model to explicitly state the fault and suggest a remedy.
+*   **Algorithm:** An LLM (Large Language Model) or a Rule-Based Expert System. It takes the outputs of the deterministic engines as its context prompt and generates a prescriptive sentence.
+
+### Model E: Supervised Fraud Classification (Deep Learning)
+*   **Target:** Production-grade predictive classification of fraudulent patterns.
+*   **Why:** To catch complex, non-linear relationships between variables that simple heuristics miss.
+*   **Algorithm:** We utilize **PyTorch** and **TensorFlow/Keras** Neural Networks alongside Scikit-Learn ensembles (Random Forest, Gradient Boosting). Features are standardized using `StandardScaler` and evaluated using K-Fold cross-validation, plotting Accuracy, Precision, Recall, F1, and ROC-AUC via `matplotlib`.
 
 ## 4. Predicted Values (Outputs)
 
@@ -68,7 +73,6 @@ The system predicts the specific category of fraud detected:
 *   `DECEASED_DISBURSEMENT`
 *   `DUPLICATE_IDENTITY_TRANSLITERATION`
 *   `CROSS_SCHEME_VIOLATION`
-*   `MIDDLEMAN_ACCOUNT`
 *   `DORMANT_UNDRAWN_FUNDS`
 
 ### 2. Risk Score (0-100)
@@ -89,10 +93,10 @@ Beyond simple classification, the system provides a direct suggestion on how to 
 
 To illustrate how features become predictions:
 
-**Scenario: Suspected Middleman Interception**
-*   **Raw Inputs:** Transaction `txn_882` for "Ramesh Patel", Amount: ₹2000. Target Bank Account: `000123456`.
-*   **Feature Extraction (Inputs):** The engine queries the database and calculates `beneficiaries_per_account = 6`. It calculates `days_since_withdrawal = 180`.
-*   **Model Processing:** The Isolation Forest (Model A) evaluates `[6, 180, 2000]` and isolates this point as a severe anomaly compared to the normal cluster (Score: 0.89).
-*   **Predicted Classification:** `MIDDLEMAN_ACCOUNT`
-*   **Predicted Risk Score:** `94` (Critical)
-*   **Generated Suggestion (Model D):** *"Fault: Account 000123456 is receiving funds for 6 distinct beneficiaries and no withdrawals have occurred in 180 days. Suggestion: Freeze account immediately and dispatch Verifier to Ramesh's registered address to investigate potential passbook confiscation by an agent."*
+**Scenario: Suspected Dormant Fund / Passbook Confiscation**
+*   **Raw Inputs:** Transaction `txn_882` for "Ramesh Patel", Amount: ₹50000 across 10 transactions.
+*   **Feature Extraction (Inputs):** The engine calculates `total_transactions = 10`, `total_amount = 50000`, and `withdrawal_rate = 0.0`.
+*   **Model Processing:** The Isolation Forest (Model A) evaluates `[10, 50000, 0.0]` and isolates this point as a severe anomaly compared to the normal cluster (Score: 0.91).
+*   **Predicted Classification:** `DORMANT_UNDRAWN_FUNDS`
+*   **Predicted Risk Score:** `91` (Critical)
+*   **Generated Suggestion (Model D):** *"Fault: Beneficiary has received ₹50,000 but the withdrawal rate is 0%. Suggestion: Freeze account immediately and dispatch Verifier to Ramesh's registered address to investigate potential passbook confiscation by an agent."*
