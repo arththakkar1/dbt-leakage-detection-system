@@ -27,6 +27,7 @@ Our documentation follows the Diataxis framework for clarity and structure. Plea
 
 - [System Overview and Architecture](doc/explanation/system-overview-and-architecture.md)
 - [Machine Learning Models and Features](doc/explanation/ml-models-and-features.md)
+- [Model Workflows](doc/explanation/model-workflows.md)
 - [Use Cases and Workflows](doc/explanation/use-cases-and-workflows.md)
 - [Future Roadmap](doc/explanation/future-roadmap.md)
 
