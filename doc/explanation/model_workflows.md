@@ -7,6 +7,18 @@ This document explains the workflow, data ingestion, and processing steps for ea
 **Goal:** Detect dormant funds anomalies where beneficiaries receive funds but never withdraw them.
 
 ### Data Travel & Workflow:
+
+```mermaid
+graph TD
+    A[TS-PS4-1.csv] --> B(Data Preprocessing)
+    B --> C{Feature Engineering}
+    C --> D[Standard Scaler]
+    D --> E((Isolation Forest))
+    E --> F[Hyperparameter Tuning]
+    F --> G(Anomaly Prediction & Risk Score)
+    G --> H[Flagged Dormant Funds]
+```
+
 1. **Data Ingestion:** Reads the transactional dataset (`TS-PS4-1.csv`) containing records of fund disbursements.
 2. **Preprocessing & Feature Engineering:**
    - Cleans the data by dropping records with missing values for `amount`, `withdrawn`, or `beneficiary_id`.
@@ -27,6 +39,17 @@ This document explains the workflow, data ingestion, and processing steps for ea
 **Goal:** Flag duplicate identities that bypass exact string matching due to regional transliteration differences (e.g., Gujarati to English spellings like "Suresh Patel" vs. "Sureshbhai Ptl").
 
 ### Data Travel & Workflow:
+
+```mermaid
+graph TD
+    A[TS-PS4-1.csv] --> B(Deduplication)
+    B --> C(Filter by District)
+    C --> D{Pairwise Comparison O N^2}
+    D --> E[FuzzyWuzzy - Levenshtein Distance]
+    E --> F{Similarity Score 85-99}
+    F -->|Different IDs| G[Flag Duplicate Identity]
+```
+
 1. **Data Ingestion:** Reads the transactional dataset (`TS-PS4-1.csv`).
 2. **Preprocessing:**
    - Deduplicates the dataset so that only one unique record per `beneficiary_id` is maintained.
@@ -45,6 +68,18 @@ This document explains the workflow, data ingestion, and processing steps for ea
 **Goal:** Generate human-readable, actionable suggestions for District Finance Officers based on flagged anomalies, transforming raw alerts into clear operational directives.
 
 ### Data Travel & Workflow:
+
+```mermaid
+graph TD
+    A[TS-PS4-1.csv Transactions] --> C{Merge on Aadhaar}
+    B[TS-PS4-2.csv Deaths] --> C
+    C --> D[Filter: transaction_date > death_date]
+    D --> E(Extract Case Context JSON)
+    E --> F[Prompt Engineering]
+    F --> G((Expert System / LLM))
+    G --> H[Actionable Directive generated]
+```
+
 1. **Data Ingestion:** Reads both the transactional dataset (`TS-PS4-1.csv`) and the civil registry / vital statistics dataset (`TS-PS4-2.csv`).
 2. **Preprocessing (Deterministic Join):**
    - Merges the transactions and deaths datasets on the `aadhaar` identification field.
@@ -63,6 +98,22 @@ This document explains the workflow, data ingestion, and processing steps for ea
 **Goal:** Train, evaluate, and compare various supervised machine learning models to automatically classify fraud and anomalies based on established heuristic patterns.
 
 ### Data Travel & Workflow:
+
+```mermaid
+graph TD
+    A[TS-PS4-1.csv] --> B(Feature Engineering)
+    B --> C{Label Synthesis: is_fraud 0 or 1}
+    C --> D(Train/Test Split 80/20)
+    D --> E[Standard Scaling]
+    E --> F1(Scikit-Learn)
+    E --> F2(PyTorch)
+    E --> F3(TensorFlow)
+    F1 --> G{Evaluation}
+    F2 --> G
+    F3 --> G
+    G --> H[Metrics & Visualizations]
+```
+
 1. **Data Ingestion & Label Synthesis:**
    - Ingests the transactional dataset (`TS-PS4-1.csv`) and performs feature engineering (aggregating by `beneficiary_id` to get totals and rates).
    - **Label Synthesis:** Since explicit fraud labels are not provided in the raw dataset, the system synthesizes a target variable (`is_fraud`). A label of 1 is assigned if the withdrawal rate is exactly 0 and the total amount is significantly high; otherwise, it is 0.
