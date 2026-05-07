@@ -63,7 +63,7 @@ graph TD
 
 ---
 
-## Model D: Prescriptive AI (Actionable Suggestions)
+## Model C: Prescriptive AI (Actionable Suggestions)
 **Location:** `notebooks/03_prescriptive_ai_suggestions.ipynb`
 **Goal:** Generate human-readable, actionable suggestions for District Finance Officers based on flagged anomalies, transforming raw alerts into clear operational directives.
 
@@ -93,7 +93,7 @@ graph TD
 
 ---
 
-## Model E: Supervised ML Model Training & Comparison
+## Model D: Supervised ML Model Training & Comparison
 **Location:** `notebooks/04_supervised_fraud_classification.ipynb`
 **Goal:** Train, evaluate, and compare various supervised machine learning models to automatically classify fraud and anomalies based on established heuristic patterns.
 

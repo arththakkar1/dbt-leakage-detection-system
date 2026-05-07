@@ -49,17 +49,17 @@ The system employs an ensemble of algorithms to ensure both high accuracy and co
 *   **Algorithm:** `FuzzyWuzzy` library combined with phonetic hashing (Double Metaphone). If two names map to the same phonetic hash, the Levenshtein distance is calculated. 
 *   **Threshold:** A similarity score `> 85%` triggers a deeper demographic check (e.g., matching DOB or District).
 
-### Model C: High-Speed Deterministic Heuristics
+### High-Speed Deterministic Heuristics
 *   **Target:** Deceased Beneficiaries & Cross-Scheme Claims.
 *   **Why:** These do not require probabilistic ML. They require absolute, lightning-fast set intersections.
 *   **Algorithm:** Pandas dataframe joins or Redis `SINTER` (Set Intersection) operations.
 
-### Model D: Prescriptive AI (Actionable Suggestions)
+### Model C: Prescriptive AI (Actionable Suggestions)
 *   **Target:** Translating raw classifications or regression scores into actionable, human-readable advice for the District Finance Officer.
 *   **Why:** Simply returning a classification flag (e.g., `DORMANT_UNDRAWN_FUNDS`) leaves the officer wondering what to do next. We use a generative model to explicitly state the fault and suggest a remedy.
 *   **Algorithm:** An LLM (Large Language Model) or a Rule-Based Expert System. It takes the outputs of the deterministic engines as its context prompt and generates a prescriptive sentence.
 
-### Model E: Supervised Fraud Classification (Deep Learning)
+### Model D: Supervised Fraud Classification (Deep Learning)
 *   **Target:** Production-grade predictive classification of fraudulent patterns.
 *   **Why:** To catch complex, non-linear relationships between variables that simple heuristics miss.
 *   **Algorithm:** We utilize **PyTorch** and **TensorFlow/Keras** Neural Networks alongside Scikit-Learn ensembles (Random Forest, Gradient Boosting). Features are standardized using `StandardScaler` and evaluated using K-Fold cross-validation, plotting Accuracy, Precision, Recall, F1, and ROC-AUC via `matplotlib`.
@@ -85,7 +85,7 @@ A deterministic probability score indicating the severity and confidence of the 
 Every prediction includes a human-readable explanation string, for example: 
 > *"Aadhaar 1234 matched against Death Register. Transaction date (2024-02-12) occurred 45 days after Official Death Date (2023-12-29)."*
 
-### 4. Prescriptive Suggestion (Model D Output)
+### 4. Prescriptive Suggestion (Model C Output)
 Beyond simple classification, the system provides a direct suggestion on how to handle the fault.
 > *"Suggestion: Immediately halt funds. Do not dispatch field verifier as death is confirmed by State Registry."*
 
@@ -99,4 +99,4 @@ To illustrate how features become predictions:
 *   **Model Processing:** The Isolation Forest (Model A) evaluates `[10, 50000, 0.0]` and isolates this point as a severe anomaly compared to the normal cluster (Score: 0.91).
 *   **Predicted Classification:** `DORMANT_UNDRAWN_FUNDS`
 *   **Predicted Risk Score:** `91` (Critical)
-*   **Generated Suggestion (Model D):** *"Fault: Beneficiary has received ₹50,000 but the withdrawal rate is 0%. Suggestion: Freeze account immediately and dispatch Verifier to Ramesh's registered address to investigate potential passbook confiscation by an agent."*
+*   **Generated Suggestion (Model C):** *"Fault: Beneficiary has received ₹50,000 but the withdrawal rate is 0%. Suggestion: Freeze account immediately and dispatch Verifier to Ramesh's registered address to investigate potential passbook confiscation by an agent."*
